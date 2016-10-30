@@ -132,9 +132,9 @@ sub main(@)
 			$fd = \*STDERR;
 		}
 
-		# logfile -> 1022
+		# logfile -> 9
 		die("$0: failed to dup2() trace fileno - $!\n")
-			if(dup2(fileno($fd), 1022) < 0);
+			if(dup2(fileno($fd), 9) < 0);
 
 		close($fd);
 	}
@@ -168,7 +168,7 @@ log-malloc-trackusage [ OPTIONS ] I<COMMAND> ...
 
 This script start given command with log-malloc2 library preloaded, thus
 enabling memory allocations tracing. By default all traces are written
-to filedescriptor 1022, but can be redirected B<--output> to file.
+to filedescriptor 9, but can be redirected B<--output> to file.
 
 liblog-malloc2.so selection:
 	- if starting from compilation directory, .libs/liblog-malloc2.so
@@ -226,7 +226,7 @@ Show man page.
 
 	$ log-malloc -o /tmp/lm.trace ./examples/leak-01
 
-	 *** log-malloc trace-fd = 1022 ***
+	 *** log-malloc trace-fd = 9 ***
 
 
 =head1 LICENSE

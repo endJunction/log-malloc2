@@ -19,7 +19,7 @@
 
 /* config (LINUX specific) */
 #ifndef LOG_MALLOC_TRACE_FD
-#define LOG_MALLOC_TRACE_FD		1022
+#define LOG_MALLOC_TRACE_FD		9
 #endif
 
 #ifndef LOG_MALLOC_BACKTRACE_COUNT
