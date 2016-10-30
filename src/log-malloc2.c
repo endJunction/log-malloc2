@@ -421,6 +421,7 @@ static inline void log_trace(char *str, size_t len, size_t max_size, int print_s
  */
 void *malloc(size_t size)
 {
+	const clock_t clck = clock();
 	struct log_malloc_s *mem;
 	sig_atomic_t memuse;
 	sig_atomic_t memruse = 0;
@@ -449,9 +450,9 @@ void *malloc(size_t size)
 		int s;
 		char buf[LOG_BUFSIZE];
 
-		s = snprintf(buf, sizeof(buf), "+ malloc %zu %p [%u:%u]\n",
+		s = snprintf(buf, sizeof(buf), "+ malloc %zu %p [%u:%u] %lu\n",
 			size, MEM_PTR(mem),
-			memuse, memruse);
+			memuse, memruse, clck);
 
 		log_trace(buf, s, sizeof(buf), 1);
 	}
@@ -460,6 +461,7 @@ void *malloc(size_t size)
 
 void *calloc(size_t nmemb, size_t size)
 {
+	const clock_t clck = clock();
 	struct log_malloc_s *mem;
 	sig_atomic_t memuse;
 	sig_atomic_t memruse = 0;
@@ -491,10 +493,10 @@ void *calloc(size_t nmemb, size_t size)
 		char buf[LOG_BUFSIZE];
 
 		//getrusage(RUSAGE_SELF, &ruse);
-		s = snprintf(buf, sizeof(buf), "+ calloc %zu %p [%u:%u] (%zu %zu)\n",
+		s = snprintf(buf, sizeof(buf), "+ calloc %zu %p [%u:%u] (%zu %zu) %lu\n",
 			nmemb * size, MEM_PTR(mem),
 			memuse, memruse,
-			nmemb, size);
+			nmemb, size, clck);
 
 		log_trace(buf, s, sizeof(buf), 1);
 	}
@@ -503,6 +505,7 @@ void *calloc(size_t nmemb, size_t size)
 
 void *realloc(void *ptr, size_t size)
 {
+	const clock_t clck = clock();
 	struct log_malloc_s *mem;
 	sig_atomic_t memuse = 0;
 	sig_atomic_t memruse = 0;
@@ -546,10 +549,10 @@ void *realloc(void *ptr, size_t size)
 		int s;
 		char buf[LOG_BUFSIZE];
 
-		s = snprintf(buf, sizeof(buf), "+ realloc %d %p %p (%zu %zu) [%u:%u]\n",
+		s = snprintf(buf, sizeof(buf), "+ realloc %d %p %p (%zu %zu) [%u:%u] %lu\n",
 			memchange, ptr,
 			MEM_PTR(mem), (mem ? mem->size : 0), size,
-			memuse, memruse);
+			memuse, memruse, clck);
 
 		log_trace(buf, s, sizeof(buf), 1);
 	}
@@ -568,6 +571,7 @@ void *realloc(void *ptr, size_t size)
 
 void *memalign(size_t boundary, size_t size)
 {
+	const clock_t clck = clock();
 	struct log_malloc_s *mem;
 	sig_atomic_t memuse;
 	sig_atomic_t memruse = 0;
@@ -598,10 +602,10 @@ void *memalign(size_t boundary, size_t size)
 		int s;
 		char buf[LOG_BUFSIZE];
 
-		s = snprintf(buf, sizeof(buf), "+ memalign %zu %p (%zu) [%u:%u]\n",
+		s = snprintf(buf, sizeof(buf), "+ memalign %zu %p (%zu) [%u:%u] %lu\n",
 			size, MEM_PTR(mem),
 			boundary, 
-			memuse, memruse);
+			memuse, memruse, clck);
 
 		log_trace(buf, s, sizeof(buf), 1);
 	}
@@ -610,6 +614,7 @@ void *memalign(size_t boundary, size_t size)
 
 int posix_memalign(void **memptr, size_t alignment, size_t size)
 {
+	const clock_t clck = clock();
 	int ret = 0;
 	struct log_malloc_s *mem = NULL;
 	sig_atomic_t memuse;
@@ -641,10 +646,10 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 		int s;
 		char buf[LOG_BUFSIZE];
 
-		s = snprintf(buf, sizeof(buf), "+ posix_memalign %zu %p (%zu %zu : %d) [%u:%u]\n",
+		s = snprintf(buf, sizeof(buf), "+ posix_memalign %zu %p (%zu %zu : %d) [%u:%u] %lu\n",
 			size, MEM_PTR(mem),
 			alignment, size, ret,
-			memuse, memruse);
+			memuse, memruse, clck);
 
 		log_trace(buf, s, sizeof(buf), 1);
 	}
@@ -653,6 +658,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 
 void *valloc(size_t size)
 {
+	const clock_t clck = clock();
 	struct log_malloc_s *mem;
 	sig_atomic_t memuse;
 	sig_atomic_t memruse = 0;
@@ -680,9 +686,9 @@ void *valloc(size_t size)
 		int s;
 		char buf[LOG_BUFSIZE];
 
-		s = snprintf(buf, sizeof(buf), "+ valloc %zu %p [%u:%u]\n",
+		s = snprintf(buf, sizeof(buf), "+ valloc %zu %p [%u:%u] %lu\n",
 			size, MEM_PTR(mem),
-			memuse, memruse);
+			memuse, memruse, clck);
 
 		log_trace(buf, s, sizeof(buf), 1);
 	}
@@ -691,6 +697,7 @@ void *valloc(size_t size)
 
 void free(void *ptr)
 {
+	const clock_t clck = clock();
 	int foreign;
 	sig_atomic_t memuse;
 	sig_atomic_t memruse = 0;
@@ -722,15 +729,15 @@ void free(void *ptr)
 		//getrusage(RUSAGE_SELF, &ruse);
 		if(!foreign)
 		{
-			s = snprintf(buf, sizeof(buf), "+ free -%zu %p [%u:%u]\n",
+			s = snprintf(buf, sizeof(buf), "+ free -%zu %p [%u:%u] %lu\n",
 				mem->size, MEM_PTR(mem),
-				memuse, memruse);
+				memuse, memruse, clck);
 		}
 		else
 		{
-			s = snprintf(buf, sizeof(buf), "+ free -%zu %p [%u:%u] !f\n",
+			s = snprintf(buf, sizeof(buf), "+ free -%zu %p [%u:%u] %lu !f\n",
 				rsize, ptr,
-				memuse, memruse);
+				memuse, memruse, clck);
 		}
 
 		log_trace(buf, s, sizeof(buf), foreign);
