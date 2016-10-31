@@ -54,6 +54,7 @@
 #include <sys/resource.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <string.h>
 #include <errno.h>
 #include <malloc.h>
 #include <time.h>
